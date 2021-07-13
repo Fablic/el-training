@@ -9,13 +9,23 @@ import { useForm, Controller } from 'react-hook-form'
 import { create, tasksSlice } from '../state/tasksSlice'
 import { useDispatch, useSelector } from 'react-redux'
 
-const useStyles = makeStyles({})
+const useStyles = makeStyles({
+  container: {
+    margin: '10px',
+    padding: '10px',
+  },
+  input: {
+    width: 'calc(100% - 48px)',
+  },
+})
 
 const AddForm: React.FC = (props) => {
   const nameRef = useRef()
   const { control, setValue } = useForm()
 
   const dispatch = useDispatch()
+
+  const classes = useStyles()
 
   const onAddClick = () => {
     const name = nameRef.current.value
@@ -24,7 +34,7 @@ const AddForm: React.FC = (props) => {
   }
 
   return (
-    <Paper>
+    <Paper className={classes.container}>
       <Controller
         name="name"
         control={control}
@@ -33,6 +43,7 @@ const AddForm: React.FC = (props) => {
           <TextField
             {...field}
             aria-label="add-name-input"
+            className={classes.input}
             label="Name"
             inputRef={nameRef}
           />

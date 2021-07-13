@@ -19,45 +19,23 @@ describe('tasks slice', () => {
       id: 1,
       name: 'task1',
       description: 'description1',
-      edit: { name: false, description: false },
+      edit: false,
     }
 
-    describe('showName', () => {
+    describe('show', () => {
       it('should set edit.name as true', () => {
-        const action = actions.showName(task.id)
-        const actual = reducer(
-          { tasks: [{ ...task, edit: { name: true, description: false } }] },
-          action
-        )
+        const action = actions.show(task.id)
+        const actual = reducer({ tasks: [{ ...task, edit: true }] }, action)
 
-        expect(actual.tasks[0].edit.name).toEqual(false)
+        expect(actual.tasks[0].edit).toEqual(false)
       })
     })
-    describe('editName', () => {
+    describe('edit', () => {
       it('should set edit.name as false', () => {
-        const action = actions.editName(task.id)
+        const action = actions.edit(task.id)
         const actual = reducer({ tasks: [task] }, action)
 
-        expect(actual.tasks[0].edit.name).toEqual(true)
-      })
-    })
-    describe('showDescription', () => {
-      it('should set edit.description as true', () => {
-        const action = actions.showDescription(task.id)
-        const actual = reducer(
-          { tasks: [{ ...task, edit: { name: false, description: true } }] },
-          action
-        )
-
-        expect(actual.tasks[0].edit.description).toEqual(false)
-      })
-    })
-    describe('editDescription', () => {
-      it('should set edit.description as false', () => {
-        const action = actions.editDescription(task.id)
-        const actual = reducer({ tasks: [task] }, action)
-
-        expect(actual.tasks[0].edit.description).toEqual(true)
+        expect(actual.tasks[0].edit).toEqual(true)
       })
     })
   })
@@ -106,7 +84,7 @@ describe('tasks slice', () => {
         const apiRet = [item1, item2]
         const expected = apiRet.map((i) => ({
           ...i,
-          edit: { name: false, description: false },
+          edit: false,
         }))
 
         const actual = reducer(
@@ -116,7 +94,7 @@ describe('tasks slice', () => {
               {
                 id: 0,
                 name: 'existing task',
-                edit: { name: false, description: false },
+                edit: false,
               },
             ],
           },
@@ -180,7 +158,7 @@ describe('tasks slice', () => {
         expect(actual.tasks.length).toEqual(2)
         expect(actual.tasks[0]).toEqual({
           ...newItem,
-          edit: { name: false, description: false },
+          edit: false,
         })
       })
 
@@ -237,7 +215,7 @@ describe('tasks slice', () => {
 
         expect(actual.tasks[0]).toEqual({
           ...updatedItem,
-          edit: { name: false, description: false },
+          edit: false,
         })
       })
 

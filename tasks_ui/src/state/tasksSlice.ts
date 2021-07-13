@@ -62,27 +62,17 @@ const findTask = (state, id) => {
   return state.tasks.find((t) => id == t.id)
 }
 
-const edit = { name: false, description: false }
-
 export const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
-    showName(state, action) {
+    show(state, action) {
       const target = findTask(state, action.payload)
-      target.edit.name = false
+      target.edit = false
     },
-    editName(state, action) {
+    edit(state, action) {
       const target = findTask(state, action.payload)
-      target.edit.name = true
-    },
-    showDescription(state, action) {
-      const target = findTask(state, action.payload)
-      target.edit.description = false
-    },
-    editDescription(state, action) {
-      const target = findTask(state, action.payload)
-      target.edit.description = true
+      target.edit = true
     },
   },
 
@@ -100,14 +90,14 @@ export const tasksSlice = createSlice({
       state.pending = false
       state.tasks = action.payload.map((i) => ({
         ...i,
-        edit,
+        edit: false,
       }))
     })
 
     builder.addCase(create.fulfilled, (state, action) => {
       state.pending = false
 
-      state.tasks = [{ ...action.payload, edit }, ...state.tasks]
+      state.tasks = [{ ...action.payload, edit: false }, ...state.tasks]
     })
 
     builder.addCase(update.fulfilled, (state, action) => {
@@ -116,7 +106,7 @@ export const tasksSlice = createSlice({
       const index = state.tasks.findIndex((t) => t.id == action.payload.id)
       state.tasks[index] = {
         ...action.payload,
-        edit,
+        edit: false,
       }
     })
 

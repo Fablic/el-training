@@ -39,7 +39,7 @@ const mockTask = {
   id: 1,
   name: 'task name',
   description: 'task description',
-  edit: { name: false, description: false },
+  edit: false,
 }
 
 describe('Tasks', () => {

@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { ConnectedRouter } from 'connected-react-router'
-import { Route, Switch } from 'react-router-dom'
+
+import { store } from './state/store'
+import AddForm from './component/AddForm'
+import Tasks from './component/Tasks'
 
 const App: React.FC = () => {
-  return <>hogehoge</>
+  return (
+    <div>
+      <Provider store={store}>
+        <AddForm />
+        <Tasks />
+      </Provider>
+    </div>
+  )
 }
 
 const appRoot = document.getElementById('app')

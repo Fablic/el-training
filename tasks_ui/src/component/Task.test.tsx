@@ -26,7 +26,7 @@ const mockTask = {
   id: 1,
   name: 'task name',
   description: 'task description',
-  edit: { name: false, description: false },
+  edit: false,
 }
 
 describe('Task', () => {
@@ -41,7 +41,7 @@ describe('Task', () => {
     })
 
     it('should show textfield for name when edit mode', () => {
-      renderIt({ ...mockTask, edit: { name: true, description: false } })
+      renderIt({ ...mockTask, edit: true })
 
       const nameDisplay = screen.queryAllByLabelText('name-display')
       expect(nameDisplay.length).toBe(0)
@@ -50,7 +50,7 @@ describe('Task', () => {
     })
 
     it('should show textfield for description when edit mode', () => {
-      renderIt({ ...mockTask, edit: { name: false, description: true } })
+      renderIt({ ...mockTask, edit: true })
 
       const descriptionDisplay = screen.queryAllByLabelText(
         'description-display'
@@ -65,11 +65,7 @@ describe('Task', () => {
 
   describe('behaviors', () => {
     describe('edit operations', () => {
-      const editNameAction = jest.spyOn(tasksSlice.actions, 'editName')
-      const editDescriptionAction = jest.spyOn(
-        tasksSlice.actions,
-        'editDescription'
-      )
+      const editAction = jest.spyOn(tasksSlice.actions, 'edit')
 
       beforeEach(() => renderIt(mockTask))
 
@@ -77,64 +73,66 @@ describe('Task', () => {
         const target = screen.getByLabelText('name-display')
         userEvent.click(target)
 
-        expect(editNameAction).toHaveBeenCalledWith(mockTask.id)
+        expect(editAction).toHaveBeenCalledWith(mockTask.id)
       })
 
       it('should set edit.description = true when description has clicked', () => {
         const target = screen.getByLabelText('description-display')
         userEvent.click(target)
 
-        expect(editDescriptionAction).toHaveBeenCalledWith(mockTask.id)
+        expect(editAction).toHaveBeenCalledWith(mockTask.id)
       })
     })
 
     describe('update operations', () => {
-      const task = { ...mockTask, edit: { name: true, description: true } }
+      const task = { ...mockTask, edit: true }
       const updateThunk = jest.spyOn(TasksSlice, 'update')
-      const destroyThunk = jest.spyOn(TasksSlice, 'destroy')
-      const showNameAction = jest.spyOn(tasksSlice.actions, 'showName')
-      const showDescriptionAction = jest.spyOn(
-        tasksSlice.actions,
-        'showDescription'
-      )
-
-      beforeEach(() => renderIt(task))
+      const showAction = jest.spyOn(tasksSlice.actions, 'show')
 
       it('should update the task when name has fixed', () => {
+        renderIt({ ...mockTask, edit: true })
         const field = screen.getByLabelText('name-edit').querySelector('input')
         userEvent.type(field, ' updated')
 
-        const btn = screen.getByLabelText('name-fix-button')
+        const btn = screen.getByLabelText('fix-button')
         userEvent.click(btn)
 
         expect(updateThunk).toHaveBeenCalledWith({
           ...task,
           name: `${task.name} updated`,
+          edit: true,
         })
-        expect(showNameAction).toHaveBeenCalledWith(task.id)
+        expect(showAction).toHaveBeenCalledWith(task.id)
       })
 
       it('should update the task when description has fixed', () => {
+        renderIt({ ...mockTask, edit: true })
         const field = screen
           .getByLabelText('description-edit')
           .querySelector('textarea')
         userEvent.type(field, ' updated')
 
-        const btn = screen.getByLabelText('description-fix-button')
+        const btn = screen.getByLabelText('fix-button')
         userEvent.click(btn)
 
         expect(updateThunk).toHaveBeenCalledWith({
           ...task,
           description: `${task.description} updated`,
+          edit: true,
         })
-        expect(showDescriptionAction).toHaveBeenCalledWith(task.id)
+        expect(showAction).toHaveBeenCalledWith(task.id)
       })
+    })
+
+    describe('destroy operation', () => {
+      const destroyThunk = jest.spyOn(TasksSlice, 'destroy')
 
       it('should destroy the Task when destroy button has clicked', () => {
+        renderIt(mockTask)
         const btn = screen.getByLabelText('destroy-button')
         userEvent.click(btn)
 
-        expect(destroyThunk).toHaveBeenCalledWith({ id: task.id })
+        expect(destroyThunk).toHaveBeenCalledWith({ id: mockTask.id })
       })
     })
   })

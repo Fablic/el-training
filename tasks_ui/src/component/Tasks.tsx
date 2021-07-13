@@ -6,18 +6,28 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import Task from './Task'
 
-const useStyles = makeStyles({})
+const useStyles = makeStyles({
+  ol: {
+    padding: 0,
+  },
+  li: {
+    listStyleType: 'none',
+    margin: '10px',
+  },
+})
 
 const Tasks: React.FC = (props) => {
   const tasks = useSelector((s) => s.tasks.tasks)
   const dispatch = useDispatch()
 
+  const classes = useStyles()
+
   useEffect(() => dispatch(index()), [])
 
   return (
-    <ol>
+    <ol className={classes.ol}>
       {tasks.map((t) => (
-        <li key={t.id}>
+        <li key={t.id} className={classes.li}>
           <Task task={t} />
         </li>
       ))}
