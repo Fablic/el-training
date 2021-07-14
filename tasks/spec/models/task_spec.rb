@@ -173,7 +173,7 @@ RSpec.describe Task, type: :model do
     end
   end
 
-  describe '検索・絞り込み・ソート機能' do
+  describe 'scope' do
     let!(:task_list) do
       [
         create(:task_list_item),
@@ -184,39 +184,96 @@ RSpec.describe Task, type: :model do
         create(:task_list_item, task_name: 'テストタスク1', deleted_at: Time.current, limit_date: Time.current + 2.days)
       ]
     end
-    context '検索文字が空欄で、絞り込みの指定がなく、ソートを行っていない場合' do
-      it '論理削除されていない、タスクを全て、作成日時の降順で取得する' do
-        expect(Task.search(nil, nil, 'created_at desc')).to match [task_list[4], task_list[3], task_list[2], task_list[1], task_list[0]]
+    context '論理削除されたタスクが存在する場合' do
+      let(:task_list_deleted_at_null) do
+        expect_task_list = []
+        task_list.each do |task|
+          expect_task_list.push(task) if task.deleted_at.nil?
+        end
+        return expect_task_list
+      end
+      it '論理削除されていないタスクを全て取得する' do
+        expect(Task.without_deleted).to match_array task_list_deleted_at_null
       end
     end
-    context '検索文字が「タス」で、絞り込みの指定がなく、ソートを行っていない場合' do
-      it '論理削除されていない、タスク名に「タス」を含むタスクを全て、作成日時の降順で取得する' do
-        expect(Task.search('タス', nil, 'created_at desc')).to match [task_list[4], task_list[2], task_list[0]]
+    context '検索欄に「タス」を入力した場合' do
+      let(:task_list_search_task_name) do
+        expect_task_list = []
+        task_list.each do |task|
+          expect_task_list.push(task) if task.task_name.include?('タス')
+        end
+        return expect_task_list
+      end
+      it 'タスク名に「タス」を含むタスクを全て取得する' do
+        expect(Task.search_task_name('タス')).to match_array task_list_search_task_name
       end
     end
-    context '検索文字が空欄で、絞り込みが「着手」を指定、ソートを行っていない場合' do
-      it '論理削除されていない、ステータスが「着手」のタスクを全て、作成日時の降順で取得する' do
-        expect(Task.search(nil, ['2'], 'created_at desc')).to match [task_list[4], task_list[1]]
+    context 'ステータスの絞り込みが「着手」を指定した場合' do
+      let(:task_list_search_status) do
+        expect_task_list = []
+        task_list.each do |task|
+          expect_task_list.push(task) if task.status_id == 2
+        end
+        return expect_task_list
+      end
+      it 'ステータスが「着手」のタスクを全て取得する' do
+        expect(Task.search_status(['2'])).to match_array task_list_search_status
       end
     end
-    context '検索文字が空欄で、絞り込みが「着手」と「完了」を指定、ソートを行っていない場合' do
-      it '論理削除されていない、ステータスが「着手」と「完了」のタスクを全て、作成日時の降順で取得する' do
-        expect(Task.search(nil, %w[2 3], 'created_at desc')).to match [task_list[4], task_list[2], task_list[1]]
+    context 'ステータスの絞り込みが「着手」と「完了」を指定した場合' do
+      let(:task_list_search_statuses) do
+        expect_task_list = []
+        task_list.each do |task|
+          expect_task_list.push(task) if task.status_id == 2 || task.status_id == 3
+        end
+        return expect_task_list
+      end
+      it 'ステータスが「着手」と「完了」のタスクを全て取得する' do
+        expect(Task.search_status(%w[2 3])).to match_array task_list_search_statuses
       end
     end
-    context '検索文字が空欄で、絞り込みが「未着手」と「着手」と「完了」の全てを指定、ソートを行っていない場合' do
-      it '論理削除されていない、タスクを全て、作成日時の降順で取得する' do
-        expect(Task.search(nil, %w[1 2 3], 'created_at desc')).to match [task_list[4], task_list[3], task_list[2], task_list[1], task_list[0]]
+    context 'ステータス絞り込みが「未着手」と「着手」と「完了」の全てを指定した場合' do
+      let(:task_list_search_statuses_all) do
+        expect_task_list = []
+        task_list.each do |task|
+          expect_task_list.push(task) if task.status_id == 1 || task.status_id == 2 || task.status_id == 3
+        end
+        return expect_task_list
+      end
+      it 'タスクを全て取得する' do
+        expect(Task.search_status(%w[1 2 3])).to match_array task_list_search_statuses_all
       end
     end
-    context '検索文字が空欄で、絞り込みの指定がなく、期限の昇順でソートを行っていた場合' do
-      it '論理削除されていない、タスクを全て、期限の昇順で取得する' do
-        expect(Task.search(nil, nil, 'limit_date asc')).to match [task_list[0], task_list[2], task_list[4], task_list[1], task_list[3]]
+    context '期限を昇順になるようにした場合' do
+      let(:task_list_sort_asc_limit_date) do
+        return task_list.sort do |a, b|
+          if a.limit_date.nil?
+            -1
+          elsif b.limit_date.nil?
+            1
+          else
+            a.limit_date <=> b.limit_date
+          end
+        end
+      end
+      it 'タスクを全て、期限の昇順で取得する' do
+        expect(Task.sort_task('limit_date asc')).to match task_list_sort_asc_limit_date
       end
     end
-    context '検索文字が「テス」で、絞り込みの「未着手」を指定、期限の降順でソートを行っていた場合' do
-      it '論理削除されていない、タスク名に「テス」を含み、ステータスが「未着手」のタスクを全て、期限の降順で取得する' do
-        expect(Task.search('テス', ['1'], 'limit_date desc')).to match [task_list[3], task_list[0]]
+    context '期限を降順になるようにした場合' do
+      let(:task_list_sort_desc_limit_date) do
+        return task_list.sort do |a, b|
+          if a.limit_date.nil?
+            1
+          elsif b.limit_date.nil?
+            -1
+          else
+            b.limit_date <=> a.limit_date
+          end
+        end
+      end
+      it 'タスクを全て、期限の降順で取得する' do
+        expect(Task.sort_task('limit_date desc')).to match task_list_sort_desc_limit_date
       end
     end
   end

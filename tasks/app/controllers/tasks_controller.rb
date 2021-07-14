@@ -3,7 +3,7 @@ class TasksController < ApplicationController
   helper_method :sort_column, :sort_direction
 
   def index
-    @tasks = Task.search(params[:keyword], params[:statuses], "#{sort_column} #{sort_direction}")
+    @tasks = Task.without_deleted.search_task_name(params[:keyword]).search_status(params[:statuses]).sort_task("#{sort_column} #{sort_direction}")
     @status_list = MasterTaskStatus.all
   end
 
