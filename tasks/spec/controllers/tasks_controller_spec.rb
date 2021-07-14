@@ -29,11 +29,8 @@ RSpec.describe TasksController, type: :controller do
     end
     context '何も指定がない場合（初期表示）' do
       let(:task_list_default) do
-        expect_task_list = []
-        task_list.each do |task|
-          expect_task_list.push(task) if task.deleted_at.nil?
-        end
-        return expect_task_list.sort do |a, b|
+        expect_task_list = task_list.select { |task| task.deleted_at.nil? }
+        expect_task_list.sort do |a, b|
           b.created_at <=> a.created_at
         end
       end
@@ -44,11 +41,8 @@ RSpec.describe TasksController, type: :controller do
     end
     context '検索欄に「テス」を入力、絞り込みを「未着手」「着手」を選択し、期限の昇順を指定した場合' do
       let(:task_list_search_and_sort) do
-        expect_task_list = []
-        task_list.each do |task|
-          expect_task_list.push(task) if task.deleted_at.nil? && task.task_name.include?('テス') && (task.status_id == 1 || task.status_id == 2)
-        end
-        return expect_task_list.sort do |a, b|
+        expect_task_list = task_list.select { |task| task.deleted_at.nil? && task.task_name.include?('テス') && (task.status_id == 1 || task.status_id == 2) }
+        expect_task_list.sort do |a, b|
           if a.limit_date.nil?
             -1
           elsif b.limit_date.nil?

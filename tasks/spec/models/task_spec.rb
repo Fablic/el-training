@@ -185,68 +185,38 @@ RSpec.describe Task, type: :model do
       ]
     end
     context '論理削除されたタスクが存在する場合' do
-      let(:task_list_deleted_at_null) do
-        expect_task_list = []
-        task_list.each do |task|
-          expect_task_list.push(task) if task.deleted_at.nil?
-        end
-        return expect_task_list
-      end
+      let(:task_list_deleted_at_null) { task_list.select { |task| task.deleted_at.nil? } }
       it '論理削除されていないタスクを全て取得する' do
         expect(Task.without_deleted).to match_array task_list_deleted_at_null
       end
     end
     context '検索欄に「タス」を入力した場合' do
-      let(:task_list_search_task_name) do
-        expect_task_list = []
-        task_list.each do |task|
-          expect_task_list.push(task) if task.task_name.include?('タス')
-        end
-        return expect_task_list
-      end
+      let(:task_list_search_task_name) { task_list.select { |task| task.task_name.include?('タス') } }
       it 'タスク名に「タス」を含むタスクを全て取得する' do
         expect(Task.search_task_name('タス')).to match_array task_list_search_task_name
       end
     end
     context 'ステータスの絞り込みが「着手」を指定した場合' do
-      let(:task_list_search_status) do
-        expect_task_list = []
-        task_list.each do |task|
-          expect_task_list.push(task) if task.status_id == 2
-        end
-        return expect_task_list
-      end
+      let(:task_list_search_status) { task_list.select { |task| task.status_id == 2 } }
       it 'ステータスが「着手」のタスクを全て取得する' do
         expect(Task.search_status(['2'])).to match_array task_list_search_status
       end
     end
     context 'ステータスの絞り込みが「着手」と「完了」を指定した場合' do
-      let(:task_list_search_statuses) do
-        expect_task_list = []
-        task_list.each do |task|
-          expect_task_list.push(task) if task.status_id == 2 || task.status_id == 3
-        end
-        return expect_task_list
-      end
+      let(:task_list_search_statuses) { task_list.select { |task| task.status_id == 2 || task.status_id == 3 } }
       it 'ステータスが「着手」と「完了」のタスクを全て取得する' do
         expect(Task.search_status(%w[2 3])).to match_array task_list_search_statuses
       end
     end
     context 'ステータス絞り込みが「未着手」と「着手」と「完了」の全てを指定した場合' do
-      let(:task_list_search_statuses_all) do
-        expect_task_list = []
-        task_list.each do |task|
-          expect_task_list.push(task) if task.status_id == 1 || task.status_id == 2 || task.status_id == 3
-        end
-        return expect_task_list
-      end
+      let(:task_list_search_statuses_all) { task_list.select { |task| task.status_id == 1 || task.status_id == 2 || task.status_id == 3 } }
       it 'タスクを全て取得する' do
         expect(Task.search_status(%w[1 2 3])).to match_array task_list_search_statuses_all
       end
     end
     context '期限を昇順になるようにした場合' do
       let(:task_list_sort_asc_limit_date) do
-        return task_list.sort do |a, b|
+        task_list.sort do |a, b|
           if a.limit_date.nil?
             -1
           elsif b.limit_date.nil?
@@ -262,7 +232,7 @@ RSpec.describe Task, type: :model do
     end
     context '期限を降順になるようにした場合' do
       let(:task_list_sort_desc_limit_date) do
-        return task_list.sort do |a, b|
+        task_list.sort do |a, b|
           if a.limit_date.nil?
             1
           elsif b.limit_date.nil?
