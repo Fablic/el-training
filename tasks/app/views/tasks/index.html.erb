@@ -3,6 +3,20 @@
 <h1>タスク一覧</h1>
 <%= link_to t('link.new'), new_task_path %>
 <br>
+<%= form_with url: tasks_path, method: :get, local: true do |f| %>
+  <%= f.text_field :keyword, value: params[:keyword] %>
+  <%= f.hidden_field :sort, value: params[:sort] %>
+  <%= f.hidden_field :direction, value: params[:direction] %>
+  <%= f.submit '検索' %>
+  <br>
+  <br>
+  <p>絞り込み</p>
+  <% @status_list.each do |status| %>
+    <%= f.check_box :statuses, { multiple: true, include_hidden: false, checked: params[:statuses].present? ? status.id.to_s.in?(params[:statuses]) : false }, status.id %>
+    <%= f.label status.status %>
+  <% end %>
+<% end %>
+<br>
 
 <table>
   <thead>
