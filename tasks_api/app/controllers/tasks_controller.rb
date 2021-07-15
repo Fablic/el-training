@@ -13,6 +13,7 @@ class TasksController < ApplicationController
 
   def create
     @task = Task.new(task_params)
+    flash.now['notice'] = 'New task has created'
 
     if @task.save
       render :show, status: :created
@@ -25,6 +26,7 @@ class TasksController < ApplicationController
 
   def update
     @task = Task.find(params[:id])
+    flash.now['notice'] = 'The task has updated'
 
     if @task.update(task_params)
       render :show
@@ -35,9 +37,10 @@ class TasksController < ApplicationController
 
   def destroy
     @task = Task.find(params[:id])
+    flash.now['notice'] = 'The task has deleted'
 
     if @task.destroy
-      head :no_content
+      render
     else
       head :unprocessable_entity
     end

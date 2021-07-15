@@ -3,19 +3,17 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 
 import { store } from './state/store'
-import AddForm from './component/AddForm'
-import Tasks from './component/Tasks'
+import App from './component/App'
 
-const App: React.FC = () => {
+const Index: React.FC = () => {
   return (
     <div>
       <Provider store={store}>
-        <AddForm />
-        <Tasks />
+        <App />
       </Provider>
     </div>
   )
 }
 
 const appRoot = document.getElementById('app')
-ReactDOM.render(<App />, appRoot)
+ReactDOM.render(<Index />, appRoot)

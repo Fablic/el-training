@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 const initialState: State = {
   tasks: [],
   pending: false,
+  notice: null,
 }
 
 export const index = createAsyncThunk('task/index', async (params, _) => {
@@ -55,7 +56,7 @@ export const destroy = createAsyncThunk('task/destroy', async (params, _) => {
     },
   })
 
-  if (ret.ok) return { id: params.id }
+  if (ret.ok) return { ...(await ret.json()), id: params.id }
 })
 
 const findTask = (state, id) => {
@@ -73,6 +74,9 @@ export const tasksSlice = createSlice({
     edit(state, action) {
       const target = findTask(state, action.payload)
       target.edit = true
+    },
+    setNotice(state, action) {
+      state.notice = action.payload
     },
   },
 
@@ -95,25 +99,31 @@ export const tasksSlice = createSlice({
     })
 
     builder.addCase(create.fulfilled, (state, action) => {
+      const { task, notice } = action.payload
       state.pending = false
 
-      state.tasks = [{ ...action.payload, edit: false }, ...state.tasks]
+      state.tasks = [{ ...task, edit: false }, ...state.tasks]
+      state.notice = notice
     })
 
     builder.addCase(update.fulfilled, (state, action) => {
+      const { task, notice } = action.payload
       state.pending = false
 
-      const index = state.tasks.findIndex((t) => t.id == action.payload.id)
+      const index = state.tasks.findIndex((t) => t.id == task.id)
       state.tasks[index] = {
-        ...action.payload,
+        ...task,
         edit: false,
       }
+      state.notice = notice
     })
 
     builder.addCase(destroy.fulfilled, (state, action) => {
+      const { id, notice } = action.payload
       state.pending = false
 
-      state.tasks = state.tasks.filter((t) => t.id != action.payload.id)
+      state.tasks = state.tasks.filter((t) => t.id != id)
+      state.notice = notice
     })
   },
 })

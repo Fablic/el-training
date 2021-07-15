@@ -26,8 +26,8 @@ RSpec.describe "Tasks", type: :request do
 
       ret = JSON.parse(response.body)
       expect(response.status).to eq 200
-      expect(ret['name']).to eq @task.name
-      expect(ret['description']).to eq @task.description
+      expect(ret['task']['name']).to eq @task.name
+      expect(ret['task']['description']).to eq @task.description
     end
 
     it 'should return 404 when the Task is inexistent' do
@@ -49,7 +49,8 @@ RSpec.describe "Tasks", type: :request do
 
       ret = JSON.parse(response.body)
       expect(response.status).to eq 201
-      expect(ret['name']).to eq @task[:name]
+      expect(ret['task']['name']).to eq @task[:name]
+      expect(ret['notice']).to eq 'New task has created'
     end
 
     it "shouldn't create new Task without name" do
@@ -84,7 +85,8 @@ RSpec.describe "Tasks", type: :request do
 
       ret = JSON.parse(response.body)
       expect(response.status).to eq 200
-      expect(ret['name']).to eq new_name
+      expect(ret['task']['name']).to eq new_name
+      expect(ret['notice']).to eq 'The task has updated'
 
       @task.reload
       expect(@task.name).to eq new_name
@@ -119,8 +121,10 @@ RSpec.describe "Tasks", type: :request do
     it 'should delete the Task' do
       delete "/tasks/#{@task.id}.json"
 
-      expect(response.status).to eq 204
+      expect(response.status).to eq 200
       expect(Task.where(id: @task.id).count).to eq 0
+      ret = JSON.parse(response.body)
+      expect(ret['notice']).to eq 'The task has deleted'
     end
 
     it 'shouldnt delete nonexistent Task' do

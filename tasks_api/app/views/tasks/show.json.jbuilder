@@ -1,1 +1,4 @@
-json.partial! "tasks/task", task: @task
+json.task do
+  json.partial! "tasks/task", task: @task
+end
+json.notice flash.now['notice']

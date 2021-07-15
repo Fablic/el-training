@@ -7,6 +7,7 @@ const actions = tasksSlice.actions
 const initialState = {
   tasks: [],
   pending: false,
+  notice: null,
 }
 
 describe('tasks slice', () => {
@@ -120,12 +121,13 @@ describe('tasks slice', () => {
         name: 'new task name',
       }
       const endpoint = 'http://localhost:3000/tasks.json'
+      const notice = 'created notice'
 
       it('should POST /tasks.json', async () => {
         const action = create({ name: newItem.name })
         fetchMock.post(endpoint, {
           status: 201,
-          body: JSON.stringify(newItem),
+          body: JSON.stringify({ task: newItem, notice }),
         })
 
         const subject = await action(jest.fn(), jest.fn(), undefined)
@@ -144,7 +146,7 @@ describe('tasks slice', () => {
       it('should set pending=false when API call has finished', () => {
         const actual = reducer(
           { ...initialState, pending: true },
-          create.fulfilled(newItem)
+          create.fulfilled({ task: newItem, notice: 'created notice' })
         )
         expect(actual.pending).toBe(false)
       })
@@ -152,7 +154,7 @@ describe('tasks slice', () => {
       it('should add the new item at beginning of the list', () => {
         const actual = reducer(
           { ...initialState, tasks: [{ id: 0, name: 'existing task' }] },
-          create.fulfilled(newItem)
+          create.fulfilled({ task: newItem, notice })
         )
 
         expect(actual.tasks.length).toEqual(2)
@@ -160,6 +162,7 @@ describe('tasks slice', () => {
           ...newItem,
           edit: false,
         })
+        expect(actual.notice).toEqual(notice)
       })
 
       it('should set pending=false when API call has failed', () => {
@@ -178,17 +181,19 @@ describe('tasks slice', () => {
       }
       const updatedItem = { ...item, description: 'new description' }
       const endpoint = `http://localhost:3000/tasks/${item.id}.json`
+      const notice = 'updated notice'
 
       it('should PUT /tasks/1.json with new values as a payload', async () => {
         const action = update(updatedItem)
+        const payload = { task: updatedItem, notice }
         fetchMock.put(endpoint, {
           status: 200,
-          body: JSON.stringify(updatedItem),
+          body: JSON.stringify(payload),
         })
 
         const subject = await action(jest.fn(), jest.fn(), undefined)
 
-        expect(subject.payload).toEqual(updatedItem)
+        expect(subject.payload).toEqual(payload)
         expect(fetchMock).toHaveFetched(
           (u, o) => u == endpoint && o.body == JSON.stringify(updatedItem)
         )
@@ -202,7 +207,7 @@ describe('tasks slice', () => {
       it('should set pending=false when API call has finished', () => {
         const actual = reducer(
           { ...initialState, pending: true },
-          update.fulfilled(updatedItem)
+          update.fulfilled({ task: updatedItem, notice })
         )
         expect(actual.pending).toBe(false)
       })
@@ -210,13 +215,14 @@ describe('tasks slice', () => {
       it('should add the new item at beginning of the list', () => {
         const actual = reducer(
           { ...initialState, tasks: [item] },
-          update.fulfilled(updatedItem)
+          update.fulfilled({ task: updatedItem, notice })
         )
 
         expect(actual.tasks[0]).toEqual({
           ...updatedItem,
           edit: false,
         })
+        expect(actual.notice).toEqual(notice)
       })
 
       it('should set pending=false when API call has failed', () => {
@@ -234,17 +240,20 @@ describe('tasks slice', () => {
         name: 'existing task name',
       }
       const endpoint = `http://localhost:3000/tasks/${item.id}.json`
+      const notice = 'deleted notice'
 
       it('should DELETE /tasks/1.json', async () => {
         const action = destroy({ id: item.id })
         fetchMock.delete(endpoint, {
-          status: 204,
+          status: 200,
+          body: JSON.stringify({ notice }),
         })
 
         const subject = await action(jest.fn(), jest.fn(), undefined)
 
         expect(fetchMock).toHaveFetched(endpoint)
         expect(subject.payload.id).toEqual(item.id)
+        expect(subject.payload.notice).toEqual(notice)
       })
 
       it('should set pending=true when initiated', () => {
@@ -255,7 +264,7 @@ describe('tasks slice', () => {
       it('should set pending=false when API call has finished', () => {
         const actual = reducer(
           { ...initialState, pending: true },
-          destroy.fulfilled({ id: item.id })
+          destroy.fulfilled({ id: item.id, notice })
         )
         expect(actual.pending).toBe(false)
       })
@@ -263,11 +272,12 @@ describe('tasks slice', () => {
       it('should add the new item at beginning of the list', () => {
         const actual = reducer(
           { ...initialState, tasks: [item, { ...item, ...{ id: 0 } }] },
-          destroy.fulfilled({ id: item.id })
+          destroy.fulfilled({ id: item.id, notice })
         )
 
         expect(actual.tasks.length).toEqual(1)
         expect(actual.tasks[0]).not.toEqual(item)
+        expect(actual.notice).toEqual(notice)
       })
 
       it('should set pending=false when API call has failed', () => {
@@ -277,6 +287,15 @@ describe('tasks slice', () => {
         )
         expect(actual.pending).toBe(false)
       })
+    })
+  })
+
+  describe('utility actions', () => {
+    describe('notice', () => {
+      const action = actions.setNotice(null)
+      const actual = reducer({ notice: 'hogehoge' }, action)
+
+      expect(actual.notice).toEqual(null)
     })
   })
 })
