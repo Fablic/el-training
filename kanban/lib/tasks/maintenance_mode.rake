@@ -6,7 +6,7 @@ namespace :maintenance_mode do
     File.open(MAINTENANCE_FILE, 'w') unless File.exist?(MAINTENANCE_FILE)
   end
 
-  desc 'start maintenance mode'
+  desc 'end maintenance mode'
   task end: :environment do
     File.delete(MAINTENANCE_FILE) if File.exist?(MAINTENANCE_FILE)
   end
