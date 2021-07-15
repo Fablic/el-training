@@ -1,11 +1,13 @@
 class TasksController < ApplicationController
-  PER = 10
   before_action :set_task, only: %i[show edit update destroy]
   helper_method :sort_column, :sort_direction
 
   def index
-    @task_list = Task.without_deleted.search_task_name(params[:keyword]).search_status(params[:statuses]).sort_task("#{sort_column} #{sort_direction}")
-    @tasks = Kaminari.paginate_array(@task_list).page(params[:page]).per(PER)
+    @tasks = Task.without_deleted
+                 .search_task_name(params[:keyword])
+                 .search_status(params[:statuses])
+                 .sort_task("#{sort_column} #{sort_direction}")
+                 .page(params[:page])
     @status_list = MasterTaskStatus.all
   end
 
