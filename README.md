@@ -1,5 +1,15 @@
 # training
 
+## ER図
+![](./erd.png)
+
+## テーブル定義
+index, NOT NULL制約, UNIQUE制約の対象のカラムのみ抜粋しました。
+![](./table_definition.png)
+
+## 画面設計図
+![](./screen_diagram.jpg)
+
 ## このカリキュラムについて
 
 この文書は、楽天株式会社ラクマ事業部で必須とされるRuby on Railsとその周辺技術の基礎を習得するための新入社員教育用カリキュラムです。
