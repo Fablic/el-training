@@ -1,4 +1,4 @@
-<%= form_with(model: task) do |f| %>
+<%= form_with(model: task, class: 'col-md-6 offset-md-3 mt-5') do |f| %>
   <% if task.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(task.errors.count, "error") %> prohibited this task from being saved:</h2>
@@ -11,30 +11,50 @@
     </div>
   <% end %>
 
-  <%= f.label :task_name %>
-  <%= f.text_field :task_name %>
+  <div class="form-group">
+    <%= f.label :task_name, class: 'control-label text-primary' %>
+    <%= f.text_field :task_name, class: 'form-control' %>
+  </div>
 
-  <%= f.label :priority %>
-  <% case controller.action_name
-  when 'new', 'create' %>
-    <%= f.collection_select :priority_id, MasterTaskPriority.all, :id, :priority, :prompt => true %>
-  <% when 'edit', 'update' %>
-    <%= f.collection_select :priority_id, MasterTaskPriority.all, :id, :priority, :prompt => @task.priority.priority %>
-  <% end %>
+  <div class="form-group">
+    <%= f.label :priority, class: 'control-label text-primary' %>
+    <% case controller.action_name
+    when 'new', 'create' %>
+      <%= f.collection_select :priority_id, MasterTaskPriority.all, :id, :priority, { :prompt => true }, { class: 'selectpicker' } %>
+    <% when 'edit', 'update' %>
+      <%= f.collection_select :priority_id, MasterTaskPriority.all, :id, :priority, { prompt: @task.priority.priority }, { class: 'selectpicker' } %>
+    <% end %>
+  </div>
 
-  <% if controller.action_name.in?(%w[edit update]) %>
-    <%= f.label :status %>
-    <%= f.collection_select :status_id, MasterTaskStatus.all, :id, :status, :prompt => @task.status.status %>
-  <% end %>
+  <div class="form-group">
+    <% if controller.action_name.in?(%w[edit update]) %>
+      <%= f.label :status, class: 'control-label text-primary' %>
+      <%= f.collection_select :status_id, MasterTaskStatus.all, :id, :status, { prompt: @task.status.status }, { class: 'selectpicker' } %>
+    <% end %>
+  </div>
 
-  <%= f.label :label %>
-  <%= f.text_field :label %>
+  <div class="form-group">
+    <%= f.label :label, class: 'control-label text-primary' %>
+    <%= f.text_field :label, class: 'form-control' %>
+  </div>
 
-  <%= f.label :limit_date %>
-  <%= f.datetime_field :limit_date %>
+  <div class="form-group">
+    <%= f.label :limit_date, class: 'control-label text-primary' %>
+    <%= f.datetime_field :limit_date, class: 'form-control' %>
+  </div>
 
-  <%= f.label :detail %>
-  <%= f.text_field :detail %>
+  <div class="form-group">
+    <%= f.label :detail, class: 'control-label text-primary' %>
+    <%= f.text_field :detail, class: 'form-control' %>
+  </div>
 
-  <%= f.submit class: 'btn btn-primary' %>
+  <div class="form-group row justify-content-center">
+    <div>
+      <%= link_to t('link.back'), '/', class: 'btn btn-outline-secondary btn-width' %>
+      <% if controller.action_name == 'edit' ||  controller.action_name == 'update'%>
+        <%= link_to t('link.show'), task, class: 'btn default-btn btn-width' %>
+      <% end %>
+      <%= f.submit class: 'btn btn-primary btn-width' %>
+    </div>
+  </div>
 <% end %>
