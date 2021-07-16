@@ -1,0 +1,93 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
+ @import "bootstrap";
+ @import 'bootstrap-select';
+
+//  共通
+th {
+  text-align: center;
+  border: none !important;
+}
+.table td {
+  vertical-align: middle;
+  padding: 5px;
+}
+.header {
+  padding: 5px 15px;
+  display: flex;
+  background-color: #b0e0e6;
+}
+.title {
+  margin: 0 auto;
+  font-size: 1.25em;
+  line-height: 38px;
+}
+a.default-btn {
+  background: #98fb98;
+  color: #000;
+  width: 100%;
+  max-width: 70px;
+}
+.default-btn:hover {
+  background: #32cd32;
+  color: #fff;
+}
+.btn-width {
+  min-width: 100px;
+}
+.icon-size {
+  width: 18px;
+}
+
+//  一覧画面
+a.new-btn {
+color: #fff;
+background-color: #f00;
+}
+.new-btn:hover {
+color: #fff;
+background-color: #a00;
+}
+.status-btn{
+  display:inline-block;
+  position: relative;
+}
+.status-btn input{
+  opacity: 0;
+  position: absolute;
+  left: 0;
+}
+.status-btn label{
+  min-width: 70px;
+  padding: 5px 15px;
+  border-radius: 5px;
+  background: #87cefa;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+  transition: .5s;
+}
+.status-btn input:checked + label{
+  background: #4169e1;
+  color: #FFF;
+}
+ul.pagination {
+  margin-bottom: 0;
+}
+.list-item {
+  text-align: center;
+}

@@ -1,4 +1,7 @@
-<h1>タスク新規作成</h1>
-<%= render partial: "form", locals: { task: @task } %>
+<header class="sticky-top">
+  <div class="header">
+    <h1 class="title">タスク新規作成</h1>
+  </div>
+</header>
 
-<%= link_to t('link.back'), '/' %>
+<%= render partial: "form", locals: { task: @task } %>

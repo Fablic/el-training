@@ -1,24 +1,50 @@
-<h1>タスク詳細</h1>
+<header class="sticky-top">
+  <div class="header">
+    <h1 class="title">タスク詳細</h1>
+  </div>
+</header>
+
 <p id="notice"><%= notice %></p>
-<p><%= Task.human_attribute_name(:id) %></p>
-<div class = "task-list-item index-id"><%= @task.id %></div>
-<p><%= Task.human_attribute_name(:status) %></p>
-<div class = "task-list-item index-status"><%= @task.status.status %></div>
-<p><%= Task.human_attribute_name(:priority) %></p>
-<div class = "task-list-item index-priority"><%= @task.priority.priority %></div>
-<p><%= Task.human_attribute_name(:label) %></p>
-<div class = "task-list-item index-label"><%= @task.label %></div>
-<p><%= Task.human_attribute_name(:task_name) %></p>
-<div class = "task-list-item index-task-name"><%= @task.task_name %></div>
-<p><%= Task.human_attribute_name(:limit_date) %></p>
-<div class = "task-list-item index-limit font-12">
-  <% if @task.limit_date != nil %>
-    <%= l @task.limit_date %>
-  <% end %>
-</div>
-<p><%= Task.human_attribute_name(:detail) %></p>
-<div class = "task-list-item index-detail font-left"><%= @task.detail %></div>
-</br>
-<%= link_to t('link.edit'), edit_task_path(@task) %> |
-<%= link_to t('link.delete'), @task, method: :delete, data: { confirm: t('confirm.delete') } %> |
-<%= link_to t('link.back'), '/' %>
+
+<section class="col-md-6 offset-md-3 mt-5">
+  <div class="form-group">
+    <div class="h6 text-primary"><%= Task.human_attribute_name(:id) %></div>
+    <div class="h5 border-bottom"><%= @task.id %></div>
+  </div>
+  <div class="form-group">
+    <div class="h6 text-primary"><%= Task.human_attribute_name(:task_name) %></div>
+    <div class="h5 border-bottom"><%= @task.task_name %></div>
+  </div>
+  <div class="form-group">
+    <div class="h6 text-primary"><%= Task.human_attribute_name(:status) %></div>
+    <div class="h5 border-bottom"><%= @task.status.status %></div>
+  </div>
+  <div class="form-group">
+    <div class="h6 text-primary"><%= Task.human_attribute_name(:priority) %></div>
+    <div class="h5 border-bottom"><%= @task.priority.priority %></div>
+  </div>
+  <div class="form-group">
+    <div class="h6 text-primary"><%= Task.human_attribute_name(:label) %></div>
+    <div class="h5 border-bottom"><%= @task.label %></div>
+  </div>
+  <div class="form-group">
+    <div class="h6 text-primary"><%= Task.human_attribute_name(:limit_date) %></div>
+    <div class="h5 border-bottom">
+      <% if @task.limit_date != nil %>
+        <%= l @task.limit_date %>
+      <% end %>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="h6 text-primary"><%= Task.human_attribute_name(:detail) %></div>
+    <div class="h5 border-bottom"><%= @task.detail %></div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div>
+      <%= link_to t('link.back'), '/', class: 'btn btn-outline-secondary btn-width' %>
+      <%= link_to t('link.edit'), edit_task_path(@task), class: 'btn default-btn btn-width' %>
+      <%= link_to t('link.delete'), @task, method: :delete, data: { confirm: t('confirm.delete') }, class: 'btn default-btn btn-width' %>
+    </div>
+  </div>
+</section>
