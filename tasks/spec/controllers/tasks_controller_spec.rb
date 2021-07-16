@@ -30,9 +30,7 @@ RSpec.describe TasksController, type: :controller do
     context '何も指定がない場合（初期表示）' do
       let(:task_list_default) do
         expect_task_list = task_list.select { |task| task.deleted_at.nil? }
-        expect_task_list.sort do |a, b|
-          b.created_at <=> a.created_at
-        end
+        default_sort(expect_task_list)
       end
       it '論理削除されていない、全てのタスクが、作成日時の降順で取得されること' do
         get :index
@@ -55,6 +53,30 @@ RSpec.describe TasksController, type: :controller do
       it '論理削除されていない、タスク名に「テス」を含む、ステータスが「未着手」と「着手」の全てのタスクが、期限の昇順で取得されること' do
         get :index, params: { keyword: 'テス', statuses: %w[1 2], direction: 'asc', sort: 'limit_date' }
         expect(assigns(:tasks)).to match task_list_search_and_sort
+      end
+    end
+  end
+
+  describe 'ページネーション' do
+    let(:task_list) { create_list(:task_list_item, 12) }
+    context '1ページ目の表示の場合' do
+      let(:task_list_default) do
+        sort_list = default_sort(task_list)
+        sort_list[0, Task.default_per_page]
+      end
+      it '作成日時の降順で、作成日時が最も新しい10件表示されること' do
+        get :index
+        expect(assigns(:tasks)).to match task_list_default
+      end
+    end
+    context '2ページ目の表示の場合' do
+      let(:task_list_next_page) do
+        sort_list = default_sort(task_list)
+        sort_list[Task.default_per_page, Task.default_per_page * 2]
+      end
+      it '2ページ目には、作成日時の降順で、作成日時が最も古い2件表示されること' do
+        get :index, params: { page: 2 }
+        expect(assigns(:tasks)).to match task_list_next_page
       end
     end
   end
@@ -100,7 +122,7 @@ RSpec.describe TasksController, type: :controller do
       end
       it '新規作成後、詳細ページにリダイレクトされること' do
         post :create, params: { task: newTask }
-        expect(response).to redirect_to "/tasks/#{Task.last.id}"
+        expect(response).to redirect_to task_path(id: Task.last.id)
       end
     end
     context '不正な値' do
@@ -125,7 +147,7 @@ RSpec.describe TasksController, type: :controller do
       it '更新後、詳細ページにリダイレクトされること' do
         task_params = normalTaskParams
         patch :update, params: { id: task.id, task: task_params }
-        expect(response).to redirect_to "/tasks/#{task.id}"
+        expect(response).to redirect_to task_path(id: task.id)
       end
     end
     context '不正な値' do
@@ -150,7 +172,13 @@ RSpec.describe TasksController, type: :controller do
     end
     it '削除後、一覧ページにリダイレクトされること' do
       patch :destroy, params: { id: task.id }
-      expect(response).to redirect_to '/tasks'
+      expect(response).to redirect_to tasks_path
     end
+  end
+
+  private
+
+  def default_sort(target_list)
+    target_list.sort_by(&:created_at).reverse
   end
 end

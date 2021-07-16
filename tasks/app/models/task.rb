@@ -1,4 +1,6 @@
 class Task < ApplicationRecord
+  paginates_per 10
+
   validates :task_name, presence: true, length: { maximum: 60 }
   validates :label, length: { maximum: 20 }
   validates :detail, length: { maximum: 250 }
